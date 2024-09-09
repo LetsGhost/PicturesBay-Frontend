@@ -2,6 +2,7 @@
 <template>
     <div class="login-container">
       <h1>Login</h1>
+      <      <ErrorAlert v-if="errorMessage" :message="errorMessage" />
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="username">Username</label>
@@ -20,15 +21,30 @@
   <script setup lang="ts">
   import { ref } from 'vue';
   import router from '../router';
+  import ErrorAlert from './erroralert.vue';
+  import { useRoute } from 'vue-router';
+  import axios from 'axios';
   
   const username = ref('');
   const password = ref('');
+  const errorMessage = ref('');
   
-  const handleSubmit = () => {
-    console.log('Username:', username.value);
-    console.log('Password:', password.value);
+  const route = useRoute();
 
+  const handleSubmit = () => {
     // Send the data to the server and save the token
+    axios.post('http://localhost:3000/login', {
+      username: username.value,
+      password: password.value
+    }).then((response) => {
+      // Save the token in the local storage
+      localStorage.setItem('token', response.data.token);
+      // Redirect the user to the home page
+      router.push('/homepage');
+    }).catch((error) => {
+      console.error(error);
+      errorMessage.value = "Login failed, please try again!";
+    });
   };
 
   const handleRegister = () => {

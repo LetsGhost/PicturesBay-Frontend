@@ -14,4 +14,17 @@ const router = createRouter({
   routes,
 });
 
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth && !isAuthenticated()) {
+    next('/'); // Redirect to login if not authenticated
+  } else {
+    next(); // Proceed to the route
+  }
+});
+
+function isAuthenticated() {
+  // Replace with your actual authentication logic
+  return !!localStorage.getItem('authToken');
+}
+
 export default router;

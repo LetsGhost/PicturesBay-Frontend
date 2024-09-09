@@ -1,6 +1,7 @@
 <template>
     <div class="login-container">
       <h1>Register</h1>
+      <ErrorAlert v-if="errorMessage" :message="errorMessage" />
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <input type="text" id="username" v-model="username" placeholder="Username" required />
@@ -22,17 +23,35 @@
   <script setup lang="ts">
   import { ref } from 'vue';
   import router from '../router';
+  import { useRoute } from 'vue-router';
+  import ErrorAlert from './erroralert.vue';
+  import axios from 'axios';
   
   const email = ref('');
   const username = ref('');
   const password = ref('');
   const bday = ref('');
+  const errorMessage = ref('');
+
+  const route = useRoute();
   
   const handleSubmit = () => {
     console.log('Username:', username.value);
     console.log('Password:', password.value);
   
     // Send the data to the server and register the user
+    axios.post('http://localhost:3000/register', {
+      email: email.value,
+      username: username.value,
+      password: password.value,
+      bday: bday.value
+    }).then((response) => {
+      // Redirect the user to the login page
+      router.push('/login');
+    }).catch((error) => {
+      console.error(error);
+      errorMessage.value = "Registration failed, please try again!";
+    });
   };
   </script>
   

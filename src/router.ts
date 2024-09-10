@@ -1,12 +1,15 @@
 // src/router.ts
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from './stores/auth';
 import Login from './components/login.vue';
 import Register from './components/register.vue';
+import Homepage from './components/homepage.vue';
 //import App from './App.vue';
 
 const routes = [
   { path: '/', component: Login },
   { path: '/register', component: Register },
+  { path: "/homepage", component: Homepage, meta: { requiresAuth: true } },
 ];
 
 const router = createRouter({
@@ -15,16 +18,12 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth && !isAuthenticated()) {
+  const authStore = useAuthStore();
+  if (to.meta.requiresAuth && !authStore.isAuthenticated()) {
     next('/'); // Redirect to login if not authenticated
   } else {
     next(); // Proceed to the route
   }
 });
-
-function isAuthenticated() {
-  // Replace with your actual authentication logic
-  return !!localStorage.getItem('authToken');
-}
 
 export default router;

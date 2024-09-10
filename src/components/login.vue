@@ -2,11 +2,11 @@
 <template>
     <div class="login-container">
       <h1>Login</h1>
-      <      <ErrorAlert v-if="errorMessage" :message="errorMessage" />
+      <ErrorAlert v-if="errorMessage" :message="errorMessage" />
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" v-model="username" required />
+          <label for="email">Email</label>
+          <input type="email" id="username" v-model="email" required />
         </div>
         <div class="form-group">
           <label for="password">Password</label>
@@ -23,28 +23,19 @@
   import router from '../router';
   import ErrorAlert from './erroralert.vue';
   import { useRoute } from 'vue-router';
-  import axios from 'axios';
+  import { useAuthStore } from '../stores/auth';
   
-  const username = ref('');
+  const email = ref('');
   const password = ref('');
   const errorMessage = ref('');
+  const authStore = useAuthStore();
   
   const route = useRoute();
 
   const handleSubmit = () => {
-    // Send the data to the server and save the token
-    axios.post('http://localhost:3000/login', {
-      username: username.value,
-      password: password.value
-    }).then((response) => {
-      // Save the token in the local storage
-      localStorage.setItem('token', response.data.token);
-      // Redirect the user to the home page
-      router.push('/homepage');
-    }).catch((error) => {
-      console.error(error);
-      errorMessage.value = "Login failed, please try again!";
-    });
+    authStore.login(email.value, password.value)
+      .then(() => {
+      })
   };
 
   const handleRegister = () => {

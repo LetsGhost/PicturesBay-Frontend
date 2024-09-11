@@ -51,7 +51,7 @@ export default defineComponent({
         return;
       }
       // Registration logic here
-      axios.post('/api/register', {
+      axios.post(import.meta.env.VITE_API_URL + '/api/register', {
         email: email.value,
         username: username.value,
         password: password.value,

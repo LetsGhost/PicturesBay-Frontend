@@ -51,11 +51,12 @@ export default defineComponent({
         return;
       }
       // Registration logic here
-      axios.post(import.meta.env.VITE_API_URL + '/api/register', {
+      axios.post(import.meta.env.VITE_API_URL + '/user/register', {
         email: email.value,
         username: username.value,
         password: password.value,
-        birthday: bday.value
+        birthdate: bday.value,
+        privacyPolicy: privacyPolicyAccepted.value,
       }).then(response => {
         // Handle successful registration
       }).catch(error => {

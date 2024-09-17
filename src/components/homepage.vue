@@ -1,36 +1,63 @@
 <template>
-    <div id="app" class="container">
-      <header class="header">
-        <h1>PicturesBay.de</h1>
-        <div class="profile-icon">
-          <img src="" alt="Profile Icon">
-        </div>
-      </header>
-      <div class="grid">
-        <div class="room" v-for="(room, index) in rooms" :key="index">
-          <img v-if="index === 0" src="" alt="Room Image">
-          <p>Room is open since:</p>
-          <p class="time">{{ room.time }}</p>
-        </div>
+  <div id="app" class="container">
+    <header class="header">
+      <h1>PicturesBay.de</h1>
+      <div class="profile-icon">
+        <img src="" alt="Profile Icon">
+      </div>
+    </header>
+    <div class="grid">
+      <div class="room" v-for="(room, index) in rooms" :key="index" @click="joinRoom(room.roomName)">
+        <p>{{ room.roomName }}</p>
+        <p>Room closes in:</p>
+        <p class="time">{{ formatTime(room.remainingTime) }}</p>
       </div>
     </div>
-  </template>
+  </div>
+</template>
+
   
-  <script>
-  export default {
-    data() {
-      return {
-        rooms: [
-          { time: "4:37" },
-          { time: "4:37" },
-          { time: "4:37" },
-          { time: "4:37" },
-          { time: "4:37" },
-        ],
-      };
-    },
-  };
-  </script>
+  <script lang="ts">
+import { defineComponent, computed } from 'vue';
+import { useSocketStore } from '../stores/useSocketStore';
+import { useRouter } from 'vue-router';
+
+interface Room {
+  roomName: string;
+  users: Array<string>;
+  remainingTime: number;
+}
+
+export default defineComponent({
+  setup() {
+    const socketStore = useSocketStore();
+    const token = localStorage.getItem('token');
+    const router = useRouter();
+    if (token) {
+      socketStore.connectSocket(token);
+    }
+
+    const rooms = computed(() => socketStore.rooms);
+
+    const formatTime = (seconds: number): string => {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}m ${remainingSeconds}s`;
+    };
+
+    const joinRoom = (roomName: string) => {
+      socketStore.joinRoom(roomName);
+      router.push({ name: 'Room', params: { roomName } });
+    };
+
+    return {
+      rooms,
+      joinRoom,
+      formatTime,
+    };
+  },
+});
+</script>
   
   <style scoped>
   /* Container Styling */
@@ -83,6 +110,11 @@
     justify-content: center;
     border-radius: 10px;
     height: 200px;
+    cursor: pointer;
+  }
+
+  .room:hover {
+    background-color: #81909e;
   }
   
   .room img {

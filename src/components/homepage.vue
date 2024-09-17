@@ -23,12 +23,6 @@ import { defineComponent, computed, ref } from 'vue';
 import { useSocketStore } from '../stores/useSocketStore';
 import { useRouter } from 'vue-router';
 
-interface Room {
-  roomName: string;
-  users: Array<string>;
-  remainingTime: number;
-}
-
 export default defineComponent({
   name: 'Homepage',
   setup() {

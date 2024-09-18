@@ -1,33 +1,35 @@
 <template>
-  <button @click="goBack" class="back-button">Back</button>
-  <div class="login-container">
-    <h1>Register</h1>
-    <form @submit.prevent="register">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" v-model="email" required />
-      </div>
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input type="text" id="username" v-model="username" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" v-model="password" required />
-      </div>
-      <div class="form-group">
-        <label for="bday">Birthday</label>
-        <input type="date" id="bday" v-model="bday" required />
-      </div>
-      <div class="form-group">
-        <input type="checkbox" id="privacyPolicy" v-model="privacyPolicyAccepted" required />
-        <label for="privacyPolicy">
-          I accept the <a href="/privacy-policy" target="_blank">privacy policy</a>
-        </label>
-      </div>
-      <p>You must be over 18 to register.</p>
-      <button type="submit">Register</button>
-    </form>
+<button @click="goBack" class="back-button">Back</button>
+  <div class="wrapper">
+    <div class="login-container">
+      <h1>Register</h1>
+      <form @submit.prevent="register">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" v-model="email" required />
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" v-model="username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" v-model="password" required />
+        </div>
+        <div class="form-group">
+          <label for="bday">Birthday</label>
+          <input type="date" id="bday" v-model="bday" required />
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="privacyPolicy" v-model="privacyPolicyAccepted" required />
+          <label for="privacyPolicy">
+            I accept the <a href="/privacy-policy" target="_blank">privacy policy</a>
+          </label>
+        </div>
+        <p>You must be over 18 to register.</p>
+        <button type="submit">Register</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -50,6 +52,12 @@ export default defineComponent({
         errorMessage.value = 'You must accept the privacy policy.';
         return;
       }
+
+      if(new Date().getFullYear() - new Date(bday.value).getFullYear() < 18) {
+        errorMessage.value = 'You must be over 18 to register.';
+        return;
+      }
+
       // Registration logic here
       axios.post(import.meta.env.VITE_API_URL + '/user/register', {
         email: email.value,
@@ -83,11 +91,22 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+body, html {
+  height: 100%;
+  margin: 0;
+}
+
+.wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+}
+
 .login-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 600px;
+  padding: 3rem;
   background-color: #93A2A3;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -110,9 +129,10 @@ label {
 
 input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem; /* Match button padding */
   border: 1px solid #5C6B73;
   border-radius: 4px;
+  box-sizing: border-box;
 }
 
 button {
@@ -130,19 +150,30 @@ button:hover {
 }
 
 .back-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
+  position: fixed;
+  top: 0.5rem; /* Stick it closer to the top */
+  left: 0.5rem; /* Stick it closer to the left */
+  padding: 0.5rem 0.75rem; /* Make the button smaller */
   background-color: #5C6B73;
-  color: #fff;
-  border: none;
+  color: white;
   border-radius: 4px;
   cursor: pointer;
+  border: none;
+  display: inline-block; /* Prevent stretching */
+  width: auto; /* Ensure it only takes up necessary space */
 }
 
 .back-button:hover {
-  background-color: #4a5a63;
+  background-color: #4a5a63; /* Same hover effect */
 }
+
+a {
+  color: #5C6B73;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #4a5a63;
+}
+
 </style>

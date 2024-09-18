@@ -29,10 +29,22 @@
     </div>
   </template>
   
-  <script>
-  export default {
-    name: 'AuctionItem'
-  }
+  <script lang="ts">
+import { defineComponent } from 'vue';
+import router  from '../router';
+
+  export default defineComponent ({
+    setup() {
+      const goBack = () => {
+        router.push('/homepage');
+      }
+
+      return {
+        goBack
+      }
+    }
+  })
+
   </script>
   
   <style scoped lang="scss">

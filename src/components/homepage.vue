@@ -1,11 +1,17 @@
 <template>
   <header class="header">
-      <h1>PicturesBay.de</h1>
-      <div class="profile-icon">
-        <img src="" alt="Profile Icon">
-      </div>
-      <button class="burger-button" @click="toggleMenu">☰</button>
-    </header>
+    <h1>PicturesBay.de</h1>
+    <button class="burger-button" @click="toggleMenu">☰</button>
+  </header>
+
+  <nav class="menu" :class="{ 'menu-open': isMenuOpen }">
+    <ul>
+      <li><a href="#" @click="">Profile</a></li>
+      <li><a href="#" @click="">Settings</a></li>
+      <li><a href="#" @click="logout()">Logout</a></li>
+    </ul>
+  </nav>
+
   <div id="app" class="container">
     <div class="grid">
       <div class="room" v-for="(room, index) in rooms" :key="index" @click="joinRoom(room.roomName)">
@@ -16,6 +22,7 @@
     </div>
   </div>
 </template>
+
 
   
   <script lang="ts">
@@ -51,53 +58,52 @@ export default defineComponent({
       isMenuOpen.value = !isMenuOpen.value;
     };
 
+    const logout = () => {
+      localStorage.removeItem('token');
+      localStorage.setItem("loggedIn", "false");
+      router.push({ name: 'Login' });
+    };
+
     return {
       rooms,
       joinRoom,
       formatTime,
       toggleMenu,
       isMenuOpen,
+      logout,
     };
   },
 });
 </script>
-  
-<style scoped>
+
+<style lang="scss">
 html, body {
   position: relative;
+  margin: 0;
   overflow-x: hidden;
-}
-
-/* Container Styling */
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: calc(100vh - 60px); /* Adjust based on header height */
-  padding: 20px;
-  align-items: flex-start; /* Align items to the start */
-  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+  background-color: #fff;
+  height: 100%;
 }
 
 /* Header Styling */
 .header {
   display: flex;
   justify-content: space-between;
-  width: auto;
   align-items: center;
-  padding: 10px;
-  background-color: #93A2A3;
-  height: 60px; /* Adjust as needed */
+  padding: 15px 30px;
+  background-color: #2A2D34;
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header h1 {
-  color: white;
-  font-family: Arial, sans-serif;
+  font-size: 1.8rem;
 }
 
 .profile-icon img {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
   background-color: white;
 }
@@ -112,23 +118,22 @@ html, body {
 
 /* Menu Styling */
 .menu {
-  position: absolute;
-  top: 60px; /* Adjust based on header height */
+  position: fixed;
+  top: 100px;
   right: 0;
   width: 250px;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 10px;
-  transform: translateX(100%); /* Initially hidden off-screen */
-  transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth transition */
-  opacity: 0; /* Initially invisible */
+  height: 100%;
+  background-color: #fff;
+  border-left: 1px;
+  padding: 20px;
+  transform: translateX(100%);
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  background-color: #2A2D34;
 }
 
 .menu-open {
-  transform: translateX(0); /* Slide in from the right */
-  opacity: 1; /* Make visible */
+  transform: translateX(0);
 }
 
 .menu ul {
@@ -138,34 +143,37 @@ html, body {
 }
 
 .menu li {
-  margin: 10px 0;
-}
-
-.menu ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu li {
-  margin: 10px 0;
+  margin: 20px 0;
 }
 
 .menu a {
   text-decoration: none;
-  color: #333;
+  color: #5C6B73;
+  font-size: 1rem;
 }
 
-/* Grid Styling */
-.grid {
+.menu a:hover {
+  color: white;
+}
+
+/* Container Styling */
+.container {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+  padding: 20px;
+  margin-top: 80px; /* Added margin to adjust for header */
+  flex-wrap: wrap;
+  gap: 30px;
+}
+
+/* Grid and Room Styling */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   width: 100%;
-  margin-top: 20px;
-  justify-content: center; /* Center the grid items horizontally */
-  flex-wrap: wrap; /* Allow items to wrap to the next row */
-  overflow: hidden;
 }
 
 .room {
@@ -173,16 +181,23 @@ html, body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 10px; /* Adjust padding to make rooms smaller */
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 20px;
+  background-color: #93A2A3;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  width: 200px; /* Set a fixed width for the rooms */
-  height: 200px; /* Set a fixed height for the rooms */
 }
 
 .room:hover {
-  background-color: #93A2A3;
+  background-color: #2A2D34;
+  color: white;
+}
+
+.room p {
+  margin: 5px 0;
   color: #5C6B73;
 }
+
 </style>

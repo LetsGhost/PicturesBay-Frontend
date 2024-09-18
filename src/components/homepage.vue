@@ -6,7 +6,7 @@
 
   <nav class="menu" :class="{ 'menu-open': isMenuOpen }">
     <ul>
-      <li><a href="#" @click="">Profile</a></li>
+      <li><a href="#" @click="goToProfile()">Profile</a></li>
       <li><a href="#" @click="">Settings</a></li>
       <li><a href="#" @click="logout()">Logout</a></li>
     </ul>
@@ -64,6 +64,10 @@ export default defineComponent({
       router.push({ name: 'Login' });
     };
 
+    const goToProfile = () => {
+      router.push({ name: 'Profile', params: { username: socketStore.$id } });
+    };
+
     return {
       rooms,
       joinRoom,
@@ -71,6 +75,7 @@ export default defineComponent({
       toggleMenu,
       isMenuOpen,
       logout,
+      goToProfile,
     };
   },
 });

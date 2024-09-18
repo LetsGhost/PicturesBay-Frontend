@@ -5,6 +5,7 @@ import Login from './components/login.vue';
 import Register from './components/register.vue';
 import Homepage from './components/homepage.vue';
 import Room from './components/room.vue';
+import Profile from './components/profile.vue';
 //import App from './App.vue';
 
 const routes = [
@@ -15,6 +16,13 @@ const routes = [
     path: '/room/:roomName',
     name: 'Room',
     component: Room,
+    props: true, // This allows the route params to be passed as props to the component,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/profile/:username',
+    name: 'Profile',
+    component: Profile,
     props: true, // This allows the route params to be passed as props to the component,
     meta: { requiresAuth: true },
   },

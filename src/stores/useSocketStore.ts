@@ -52,9 +52,15 @@ export const useSocketStore = defineStore('socket', {
     joinRoom(roomName: string) {
       if (this.socket) {
         this.socket.emit('joinRoom', roomName);
+
         this.socket.on("room", (data: any) => {
           // Ensure no circular references
           this.currentRoom = data
+        });
+
+        this.socket.on("oneMinuteTimerEnd", (data: any) => {
+          // Ensure no circular references
+          this.currentRoom.oneMinuteTimer = data
         });
       }
     },

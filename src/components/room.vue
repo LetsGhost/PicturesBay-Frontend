@@ -21,9 +21,9 @@
       </div>
       <div class="info-container">
         <h2>Painting Info</h2>
-        <p><strong>Painter:</strong> {{ room }}</p>
+        <p><strong>Painter:</strong> {{ room.painting.name }}</p>
         <p><strong>Publishing Year:</strong> 2024</p>
-        <p><strong>Level:</strong> Common</p>
+        <p><strong>Level:</strong> {{ room.painting.level }}</p>
         <p><strong>Description:</strong> This is a beautiful painting that captures the essence of modern art.</p>
       </div>
       <div class="timers">

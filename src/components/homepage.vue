@@ -22,63 +22,78 @@
     </div>
   </div>
 </template>
-
-
   
-  <script lang="ts">
-import { defineComponent, computed, ref } from 'vue';
-import { useSocketStore } from '../stores/useSocketStore';
-import { useRouter } from 'vue-router';
+<script lang="ts">
+  import { defineComponent, computed, ref, onMounted, onUnmounted } from 'vue';
+  import { useSocketStore } from '../stores/useSocketStore';
+  import { useRouter } from 'vue-router';
 
-export default defineComponent({
-  name: 'Homepage',
-  setup() {
-    const isMenuOpen = ref(false);
-    const socketStore = useSocketStore();
-    const token = localStorage.getItem('token');
-    const router = useRouter();
-    if (token) {
-      socketStore.connectSocket(token);
-    }
+  export default defineComponent({
+    name: 'Homepage',
+    setup() {
+      const isMenuOpen = ref(false);
+      const socketStore = useSocketStore();
+      const token = localStorage.getItem('token');
+      const router = useRouter();
+      if (token) {
+        socketStore.connectSocket(token);
+      }
 
-    const rooms = computed(() => socketStore.rooms);
+      const rooms = computed(() => socketStore.rooms);
 
-    const formatTime = (seconds: number): string => {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = Math.floor(seconds % 60);
-      return `${minutes}m ${remainingSeconds}s`;
-    };
+      const formatTime = (seconds: number): string => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}m ${remainingSeconds}s`;
+      };
 
-    const joinRoom = (roomName: string) => {
-      socketStore.joinRoom(roomName);
-      router.push({ name: 'Room', params: { roomName } });
-    };
+      const joinRoom = (roomName: string) => {
+        socketStore.joinRoom(roomName);
+        router.push({ name: 'Room', params: { roomName } });
+      };
 
-    const toggleMenu = () => {
-      isMenuOpen.value = !isMenuOpen.value;
-    };
+      const toggleMenu = () => {
+        isMenuOpen.value = !isMenuOpen.value;
+      };
 
-    const logout = () => {
-      localStorage.removeItem('token');
-      localStorage.setItem("loggedIn", "false");
-      router.push({ name: 'Login' });
-    };
+      const logout = () => {
+        localStorage.removeItem('token');
+        localStorage.setItem("loggedIn", "false");
+        router.push({ name: 'Login' });
+      };
 
-    const goToProfile = () => {
-      router.push({ name: 'Profile', params: { username: socketStore.$id } });
-    };
+      const goToProfile = () => {
+        router.push({ name: 'Profile', params: { username: socketStore.$id } });
+      };
 
-    return {
-      rooms,
-      joinRoom,
-      formatTime,
-      toggleMenu,
-      isMenuOpen,
-      logout,
-      goToProfile,
-    };
-  },
-});
+      const updateRemainingTime = () => {
+        rooms.value.forEach(room => {
+          if (room.remainingTime > 0) {
+            room.remainingTime -= 1;
+          }
+        });
+      };
+
+      let timer: number;
+      onMounted(() => {
+        timer = window.setInterval(updateRemainingTime, 1000);
+      });
+
+      onUnmounted(() => {
+        clearInterval(timer);
+      });
+
+      return {
+        rooms,
+        joinRoom,
+        formatTime,
+        toggleMenu,
+        isMenuOpen,
+        logout,
+        goToProfile,
+      };
+    },
+  });
 </script>
 
 <style lang="scss">

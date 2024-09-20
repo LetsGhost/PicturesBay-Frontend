@@ -4,7 +4,7 @@
       <h1>Auction Room1</h1>
       <button @click="goBack" class="back-button">Back</button>
     </header>
-    <div class="container">
+    <div class="container" v-if="room">
       <div class="main-content">
         <div class="frame">
           <h1 class="title">Item Title</h1>
@@ -21,26 +21,81 @@
       </div>
       <div class="info-container">
         <h2>Painting Info</h2>
-        <p><strong>Painter:</strong> John Doe</p>
+        <p><strong>Painter:</strong> {{ room }}</p>
         <p><strong>Publishing Year:</strong> 2024</p>
         <p><strong>Level:</strong> Common</p>
         <p><strong>Description:</strong> This is a beautiful painting that captures the essence of modern art.</p>
       </div>
+      <div class="timers">
+      <h2>Timers</h2>
+      <p><strong>Room Timer:</strong> {{ formatTime(room.remainingTime) }} seconds</p>
+      <p><strong>One-Minute Timer:</strong> {{ formatTime(room.oneMinuteTimer) }} seconds</p>
+    </div>
     </div>
   </template>
   
   <script lang="ts">
-import { defineComponent } from 'vue';
-import router  from '../router';
+import { defineComponent, computed, ref, onMounted, onUnmounted } from 'vue';
+import { useSocketStore } from '../stores/useSocketStore';
+import { useRouter } from 'vue-router';
+
 
   export default defineComponent ({
     setup() {
+      const socketStore = useSocketStore();
+      const token = localStorage.getItem('token');
+      const router = useRouter();
+      if (token) {
+        socketStore.connectSocket(token);
+      }
+
+      const room = computed(() => socketStore.currentRoom);
+      const currentPaintingIndex = ref(0);
+
+      const formatTime = (seconds: number): string => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.floor(seconds % 60);
+        return `${minutes}m ${remainingSeconds}s`;
+      };
+
+      const updateRemainingTime = () => {
+      if (room.value && room.value.remainingTime > 0) {
+        room.value.remainingTime -= 1;
+      }
+      if (room.value && room.value.oneMinuteTimer > 0) {
+        room.value.oneMinuteTimer -= 1;
+      }
+    };
+
+    const handleMinuteTimerEnd = () => {
+      if (room.value && room.value.paintings.length > 0) {
+        currentPaintingIndex.value = (currentPaintingIndex.value + 1) % room.value.paintings.length;
+      }
+    };
+
+    let timer: number;
+    onMounted(() => {
+      timer = window.setInterval(updateRemainingTime, 1000);
+      if (socketStore.socket) {
+        socketStore.socket.on('minuteTimerEnd', handleMinuteTimerEnd);
+      }
+    });
+
+    onUnmounted(() => {
+      clearInterval(timer);
+      if (socketStore.socket) {
+        socketStore.socket.off('minuteTimerEnd', handleMinuteTimerEnd);
+      }
+    });
+
       const goBack = () => {
         router.push('/homepage');
       }
 
       return {
-        goBack
+        goBack,
+        room,
+        formatTime,
       }
     }
   })
@@ -169,6 +224,16 @@ import router  from '../router';
   
   .info-container p strong {
     color: #333;
+  }
+
+  .timers {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px; /* Fixed width for info container */
+    color: black;
   }
   </style>
   

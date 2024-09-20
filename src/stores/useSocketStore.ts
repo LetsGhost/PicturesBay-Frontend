@@ -6,11 +6,13 @@ interface Room {
   roomName: string;
   users: Array<string>;
   remainingTime: number;
+  oneMinuteTimer: number;
 }
 
 interface SocketState {
   socket: Socket | null;
   rooms: Array<Room>;
+  currentRoom?: any;
 }
 
 export const useSocketStore = defineStore('socket', {
@@ -50,6 +52,10 @@ export const useSocketStore = defineStore('socket', {
     joinRoom(roomName: string) {
       if (this.socket) {
         this.socket.emit('joinRoom', roomName);
+        this.socket.on("room", (data: any) => {
+          // Ensure no circular references
+          this.currentRoom = data
+        });
       }
     },
     leaveRoom(roomName: string) {
